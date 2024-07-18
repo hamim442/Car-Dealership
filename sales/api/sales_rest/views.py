@@ -164,6 +164,50 @@ def detail_customers(request, id):
         return JsonResponse({"message": "Customer Deleted"}, status=204)
 
 
+@require_http_methods(["GET", "POST"])
+def sales_list(request):
+    if request.method == "GET":
+        sales = Sale.objects.all()
+        return JsonResponse(
+            {"sales": sales},
+            encoder=SaleEncoder,
+            safe=False
+        )
+    else:  # POST
+        content = json.loads(request.body)
+
+        try:
+            automobile = AutomobileVO.objects.get(vin=content["automobile"])
+            salesperson = Salesperson.objects.get(id=content["salesperson"])
+            customer = Customer.objects.get(id=content["customer"])
+        except (AutomobileVO.DoesNotExist, Salesperson.DoesNotExist, Customer.DoesNotExist) as e:
+            return JsonResponse(
+                {"message": str(e)},
+                status=400
+            )
+
+        sale = Sale.objects.create(
+            automobile=automobile,
+            salesperson=salesperson,
+            customer=customer,
+            price=content["price"]
+        )
+        return JsonResponse(
+            sale,
+            encoder=SaleEncoder,
+            safe=False,
+            status=201
+        )
+
+
+@require_http_methods(["DELETE"])
+def sale_detail(request, id):
+    sale = get_object_or_404(Sale, id=id)
+    if request.method == "DELETE":
+        sale.delete()
+        return JsonResponse({"message": "Sale Deleted"}, status=204)
+
+
 # @require_http_methods(["GET", "POST"])
 # def automobiles_list(request):
 #     if request.method == "GET":
