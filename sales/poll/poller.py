@@ -19,7 +19,7 @@ def poll():
         print("Sales poller polling for data")
         try:
             # Write your polling logic, here
-            response = requests.get("http://inventory-api:8000/api/automobiles/")
+            response = requests.get("http://inventory-api:8100/api/automobiles/")
             content = response.json()
             response.raise_for_status()  # Raise an error for bad status codes
 

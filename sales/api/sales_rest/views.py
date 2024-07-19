@@ -1,9 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Salesperson, Customer, AutomobileVO, Sale
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from common.json import ModelEncoder
 import json
+from decimal import Decimal
 
 
 class SalespersonEncoder(ModelEncoder):
@@ -42,16 +43,18 @@ class SaleEncoder(ModelEncoder):
         "automobile",
         "salesperson",
         "customer",
-        "price",
-        "automobiles",
-        "salesperson",
-        "customer"
+        "price"
     ]
     encoders = {
         "automobile": AutomobileVOEncoder(),
         "salesperson": SalespersonEncoder(),
         "customer": CustomerEncoder(),
     }
+
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)  #insures that any decimal oject converts into float
 
 
 @require_http_methods(["GET", "POST"])
