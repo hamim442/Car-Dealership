@@ -37,7 +37,7 @@ class AppointmentEncoder(ModelEncoder):
     
 def is_vip(vin):
     try:
-        automobile = AutomobileVO.objects.all(vin=vin)
+        automobile = AutomobileVO.objects.get(vin=vin) #this has to be get and not all
         return automobile.sold
     except AutomobileVO.DoesNotExist:
         return False
@@ -105,23 +105,103 @@ def technician_detail(request, id):
 @require_http_methods(["GET", "POST"])
 def appointment_list(request):
     if request.method == "GET":
-        appointment = Appointment.objects.all()
-        print("Appointments:", appointment)  
-        return JsonResponse(
-                            {"appointment": appointment},
-                            encoder=AppointmentEncoder, 
-                            safe=False)
-    else: #post
+        appointments = Appointment.objects.all()
+        response = []
+
+        for appointment in appointments:
+            appointment_data = AppointmentEncoder().encode(appointment)
+            appointment_data = json.loads(appointment_data)
+            appointment_data['is_vip'] = is_vip(appointment.vin)
+
+            response.append(appointment_data)
+
+        return JsonResponse({"appointments": response}, safe=False)
+    
+    else:
         content = json.loads(request.body)
+        technician = get_object_or_404(Technician, id=content['technician'])
+
         appointment = Appointment.objects.create( 
             date_time=content['date_time'],
-            reason=content['reason'],
+            reason = content['reason'],
             status = content['status'],
             vin = content['vin'],
-            technician = Technician.objects.get(id=content['technician'])
+            technician=technician
         )
-        return JsonResponse({"appointment": appointment}, encoder=AppointmentEncoder, safe=False)
 
+        #Need to encode the newly created appointment date
+        appointment_data = AppointmentEncoder().encode(appointment)
+        appointment_data = json.loads(appointment_data)
+
+        appointment_data['is_vip'] = is_vip(appointment.vin)
+
+        return JsonResponse(appointment_data, safe=False, status=201)
+    
+    
+@require_http_methods(["GET", "PUT", "DELETE"])
+def appointment_detail(request, id):
+    try:
+        appointment = Appointment.objects.get(id=id)
+    except Appointment.DoesNotExist:
+        return JsonResponse({"message": "Appointment doesn't exist"}, status=404)
+    
+    if request.method == "GET":
+        appointment_data = AppointmentEncoder().encode(appointment)
+        appointment_data = json.loads(appointment_data)
+        appointment_data['is_vip'] = is_vip(appointment.vin)
+        return JsonResponse( 
+            appointment_data,
+            safe=False
+        )
+    elif request.method == "PUT":
+        content = json.loads(request.body)
+        for key, value in content.items():
+            setattr(appointment, key, value)
+        appointment.save()
+
+        appointment_data = AppointmentEncoder().encode(appointment)
+        appointment_data = json.loads(appointment_data)
+        appointment_data['is_vip'] = is_vip(appointment.vin)
+       
+        return JsonResponse( 
+            appointment_data,
+            safe=False
+        )
+    
+    elif request.method == "DELETE":
+        appointment.delete()
+        return JsonResponse({"message": "Appointment Deleted"}, status=204)
+    
+@require_http_methods(["PUT"])
+def cancel_appointment(request, id):
+    try:
+        appointment = Appointment.objects.get(id=id) #Get appointment by ID
+    except Appointment.DoesNotExist:
+        return JsonResponse({"message": "Appointment doesn't exist"}, status=404)
+    
+    appointment.status = "canceled"
+    appointment.save()
+    appointment_data = AppointmentEncoder().encode(appointment) #this line convert object into
+                                                                # json format
+    appointment_data = json.loads(appointment_data)
+    appointment_data['is_vip'] = is_vip(appointment.vin)
+    return JsonResponse(appointment_data, safe=False)
+
+
+@require_http_methods(["PUT"])
+def finish_appointment(request, id):
+    try:
+        appointment = Appointment.objects.get(id=id) #Get appointment by ID
+    except Appointment.DoesNotExist:
+        return JsonResponse({"message": "Appointment doesn't exist"}, status=404)
+    
+    appointment.status = "finished"
+    appointment.save()
+    appointment_data = AppointmentEncoder().encode(appointment) #this line convert object into
+                                                                # json format
+    appointment_data = json.loads(appointment_data)
+    appointment_data['is_vip'] = is_vip(appointment.vin)
+    return JsonResponse(appointment_data, safe=False)
 
 
 
