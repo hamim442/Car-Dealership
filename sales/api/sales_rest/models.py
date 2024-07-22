@@ -36,4 +36,11 @@ class Sale(models.Model):
 
     def __str__(self):
         return f"Sale of {self.automobile} to {self.customer} by {self.salesperson}"
+
+
+# class Manufacturer(models.Model):
+#     name = models.CharField(max_length=100)
+
+#     def __str__(self):
+#         return self.name
 # Create your models here.

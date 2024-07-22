@@ -1,29 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React from "react";
+import { useFetch } from "./hooks";
 
-const ListCustomers = () => {
-  const [customers, setCustomers] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch('http://localhost:8090/api/customers/');
-      const data = await response.json();
-      setCustomers(data);
-    };
-    fetchData();
-  }, []);
+export default function CustomerList() {
+  const { data, error } = useFetch(
+    {customers: []},
+    "http://localhost:8090/api/customers/"
+  );
+  if (error) {
+    return <p>{error.message}</p>;
+  }
+  const customers = data.customers || [];
 
   return (
     <div>
       <h2>Customers</h2>
-      <ul>
-        {customers.map((customer) => (
-          <li key={customer.id}>
-            {customer.first_name} {customer.last_name} (Address: {customer.address}, Phone: {customer.phone_number})
-          </li>
-        ))}
-      </ul>
+      <table className="table table-striped">
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Phone Number</th>
+            <th>Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          {customers.map((customers) => (
+            <tr key={customers.id}>
+              <td>{customers.first_name}</td>
+              <td>{customers.last_name}</td>
+              <td>{customers.phone_number}</td>
+              <td>{customers.address}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-};
-
-export default ListCustomers;
+}

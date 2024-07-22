@@ -1,29 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import { useFetch } from "./hooks";
 
-const ListSalespeople = () => {
-  const [salespeople, setSalespeople] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch('http://localhost:8090/api/salespeople/');
-      const data = await response.json();
-      setSalespeople(data);
-    };
-    fetchData();
-  }, []);
+export default function SalespeopleList() {
+  const { data, error } = useFetch(
+    {salespeople: []},
+    "http://localhost:8090/api/salespeople/"
+  );
+  if (error) {
+    return <p>{error.message}</p>;
+  }
+  const salespeople = data.salespeople || [];
 
   return (
     <div>
       <h2>Salespeople</h2>
-      <ul>
-        {salespeople.map((salesperson) => (
-          <li key={salesperson.id}>
-            {salesperson.first_name} {salesperson.last_name} (ID: {salesperson.employee_id})
-          </li>
-        ))}
-      </ul>
+      <table className="table table-striped">
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {salespeople.map((salespeople) => (
+            <tr key={salespeople.id}>
+              <td>{salespeople.employee_id}</td>
+              <td>{salespeople.first_name}</td>
+              <td>{salespeople.last_name}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-};
-
-export default ListSalespeople;
+}

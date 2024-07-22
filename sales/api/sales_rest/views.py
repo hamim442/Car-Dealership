@@ -211,6 +211,101 @@ def sale_detail(request, id):
         return JsonResponse({"message": "Sale Deleted"}, status=204)
 
 
+@require_http_methods(["GET"])
+def unsold_automobiles(request):
+    automobiles = AutomobileVO.objects.filter(sold=False)
+    return JsonResponse(
+        {"automobiles": list(automobiles.values())},
+        encoder=AutomobileVOEncoder,
+        safe=False
+    )
+
+
+@require_http_methods(["GET", "POST"])
+def automobiles_list(request):
+    if request.method == "GET":
+        automobiles = AutomobileVO.objects.all()
+        return JsonResponse(
+            {"automobiles": list(automobiles.values())},
+            encoder=AutomobileVOEncoder,
+            safe=False
+        )
+    else:  # POST
+        content = json.loads(request.body)
+        new_automobile = AutomobileVO.objects.create(
+            vin=content['vin'],
+            sold=content['sold']
+        )
+        return JsonResponse(
+            new_automobile,
+            encoder=AutomobileVOEncoder,
+            safe=False,
+            status=201
+        )
+
+
+@require_http_methods(["GET", "PUT", "DELETE"])
+def automobile_detail(request, id):
+    try:
+        automobile = AutomobileVO.objects.get(id=id)
+    except AutomobileVO.DoesNotExist:
+        return JsonResponse({"message": "Automobile doesn't exist"}, status=404)
+    if request.method == "GET":
+        return JsonResponse(
+            automobile,
+            encoder=AutomobileVOEncoder,
+            safe=False
+        )
+    elif request.method == "PUT":
+        content = json.loads(request.body)
+        for key, value in content.items():
+            setattr(automobile, key, value)
+        automobile.save()
+        return JsonResponse(
+            automobile,
+            encoder=AutomobileVOEncoder,
+            safe=False
+        )
+    elif request.method == "DELETE":
+        automobile.delete()
+        return JsonResponse(
+            {"message": "Automobile deleted successfully"},
+            status=204
+        )
+
+
+@require_http_methods(["GET"])
+def sales_history(request, salesperson_id):
+    sales = Sale.objects.filter(salesperson_id=salesperson_id).select_related('customer', 'automobile')
+    sales_data = [{
+        'id': sale.id,
+        'salesperson': f'{sale.salesperson.first_name} {sale.salesperson.last_name}',
+        'customer': f'{sale.customer.first_name} {sale.customer.last_name}',
+        'automobile_vin': sale.automobile.vin,
+        'price': sale.price,
+    } for sale in sales]
+    return JsonResponse({'sales': sales_data})
+
+# @require_http_methods(["GET", "POST"])
+# def manufacturers_list(request):
+#     if request.method == "GET":
+#         manufacturers = Manufacturer.objects.all()
+#         return JsonResponse(
+#             {"manufacturers": manufacturers},
+#             encoder=ManufacturerEncoder,
+#             safe=False
+#         )
+#     else:  # POST
+#         content = json.loads(request.body)
+#         new_manufacturer = Manufacturer.objects.create(
+#             name=content['name']
+#         )
+#         return JsonResponse(
+#             new_manufacturer,
+#             encoder=ManufacturerEncoder,
+#             safe=False,
+#             status=201
+#         )
 # @require_http_methods(["GET", "POST"])
 # def automobiles_list(request):
 #     if request.method == "GET":

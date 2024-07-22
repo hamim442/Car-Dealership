@@ -11,26 +11,28 @@ function Nav() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
           <li className="nav-item">
-              <NavLink className="nav-link" to="/add-salesperson">Add Salesperson</NavLink>
+              <NavLink className="nav-link" to="/salespeople/new">Add a Salesperson</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/salespeople">List Salespeople</NavLink>
+              <NavLink className="nav-link" to="/salespeople">Salespeople</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/add-customer">Add Customer</NavLink>
+              <NavLink className="nav-link" to="/customer/new">Add a Customer</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/customers">List Customers</NavLink>
+              <NavLink className="nav-link" to="/customers">Customers</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/add-sale">Record a Sale</NavLink>
+              <NavLink className="nav-link" to="/sales/record">Record Sale</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" to="/sales">List Sales</NavLink>
+              <NavLink className="nav-link" to="/sales">Sales</NavLink>
             </li>
+
             <li className="nav-item">
-              <NavLink className="nav-link" to="/salesperson-history">Salesperson History</NavLink>
+              <NavLink className="nav-link" to="/sales/history">Salesperson History</NavLink>
             </li>
+
           </ul>
         </div>
       </div>
@@ -38,4 +40,4 @@ function Nav() {
   )
 }
 
-export default Nav;
+export default Nav; // Add Sales
