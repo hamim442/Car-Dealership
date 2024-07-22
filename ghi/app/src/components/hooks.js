@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+
 export function useFetch(initialState, url, options) {
   const [data, setData] = useState(initialState);
   const [error, setError] = useState(null);
+
   useEffect(() => {
     async function fetcher() {
       try {
@@ -21,6 +23,7 @@ export function useFetch(initialState, url, options) {
     }
     fetcher();
   }, [url, options]);
+
   return {
     data,
     error,

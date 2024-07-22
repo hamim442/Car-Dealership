@@ -12,5 +12,4 @@ urlpatterns = [
     path('automobiles/<int:id>/', views.automobile_detail, name='automobile_detail'),
     path('automobiles/unsold/', views.unsold_automobiles, name='unsold_automobiles'),
     path('api/saleshistory/<int:salesperson_id>/', views.sales_history, name='sales_history'),
-    #  path('manufacturers/', views.manufacturers_list, name='manufacturers_list'),
 ]

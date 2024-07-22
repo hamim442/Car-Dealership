@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+
 export default function SalespersonHistory() {
   const [sales, setSales] = useState([]);
   const [filteredSales, setFilteredSales] = useState([]);
   const [search, setSearch] = useState('');
+
   useEffect(() => {
     fetch('http://localhost:8090/api/sales/')
       .then(response => response.json())
@@ -11,6 +13,7 @@ export default function SalespersonHistory() {
         setFilteredSales(data.sales);
       });
   }, []);
+
   const handleSearch = (event) => {
     const value = event.target.value;
     setSearch(value);
@@ -20,10 +23,11 @@ export default function SalespersonHistory() {
     );
     setFilteredSales(filtered);
   };
+
   return (
     <div>
       <h2>Salesperson History</h2>
-      <div className="mb-3">
+      <div className="input-group mb-3">
         <input
           type="text"
           className="form-control"
@@ -31,6 +35,9 @@ export default function SalespersonHistory() {
           value={search}
           onChange={handleSearch}
         />
+        <button className="btn btn-outline-secondary" type="button">
+          <span className="dropdown-toggle"></span>
+        </button>
       </div>
       <table className="table table-striped">
         <thead>

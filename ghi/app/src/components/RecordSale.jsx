@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useFetch } from './hooks';
+
 function RecordSales() {
   const { data: automobilesData } = useFetch(
     {
@@ -19,18 +20,29 @@ function RecordSales() {
     },
     'http://localhost:8090/api/customers/'
   );
+
   const [automobile, setAutomobile] = useState('');
   const [salesperson, setSalesperson] = useState('');
   const [customer, setCustomer] = useState('');
   const [price, setPrice] = useState('');
+
+  // Log fetched data to ensure it's correct
+  console.log('Automobiles Data:', automobilesData);
+  console.log('Salespeople Data:', salespeopleData);
+  console.log('Customers Data:', customersData);
+
   async function handleSubmit(event) {
     event.preventDefault();
+
     const data = {
       automobile: automobile,
       salesperson: salesperson,
       customer: customer,
       price: price,
     };
+
+    console.log('Data to send:', data);
+
     const salesUrl = 'http://localhost:8090/api/sales/';
     const fetchConfig = {
       method: 'post',
@@ -39,6 +51,7 @@ function RecordSales() {
         'Content-Type': 'application/json',
       },
     };
+
     try {
       const response = await fetch(salesUrl, fetchConfig);
       if (response.ok) {
@@ -50,11 +63,14 @@ function RecordSales() {
         setPrice('');
       } else {
         console.error(`Error: ${response.status} ${response.statusText}`);
+        const errorData = await response.json();
+        console.error('Error details:', errorData);
       }
     } catch (error) {
       console.error('Fetch error:', error);
     }
   }
+
   return (
     <div className="row">
       <div className="offset-3 col-6">
@@ -72,7 +88,7 @@ function RecordSales() {
               >
                 <option value="">Choose an automobile VIN...</option>
                 {automobilesData.automobiles.map((auto) => (
-                  <option key={auto.id} value={auto.id}>
+                  <option key={auto.vin} value={auto.vin}>
                     {auto.vin}
                   </option>
                 ))}
@@ -132,4 +148,5 @@ function RecordSales() {
     </div>
   );
 }
+
 export default RecordSales;
