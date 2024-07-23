@@ -54,7 +54,7 @@ class SaleEncoder(ModelEncoder):
     def default(self, obj):
         if isinstance(obj, Decimal):
             return float(obj)
-        return super().default(obj)  #insures that any decimal oject converts into float
+        return super().default(obj)   #insures that any decimal oject converts into float
 
 
 @require_http_methods(["GET", "POST"])
